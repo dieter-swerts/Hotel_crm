@@ -1,0 +1,821 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hotel Offer Tracker</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #687386;
+      --border: #d9dfeb;
+      --accent: #2563eb;
+      --accent-dark: #1d4ed8;
+      --danger: #dc2626;
+      --ok: #16a34a;
+      --warn: #d97706;
+      --shadow: 0 12px 30px rgba(20, 30, 50, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      padding: 28px 20px 12px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(28px, 4vw, 44px);
+      letter-spacing: -0.04em;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 760px;
+      line-height: 1.5;
+    }
+
+    main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 20px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .add-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    input, select, textarea, button {
+      font: inherit;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 14px;
+      background: var(--accent);
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .08s ease, background .15s ease;
+    }
+
+    button:hover { background: var(--accent-dark); }
+    button:active { transform: translateY(1px); }
+
+    .btn-secondary {
+      background: #eef2ff;
+      color: #1e3a8a;
+      border: 1px solid #c7d2fe;
+    }
+
+    .btn-secondary:hover { background: #dbeafe; }
+
+    .btn-danger {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .btn-danger:hover { background: #fecaca; }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr 220px 220px auto auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .stats {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      background: #fff;
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1100px;
+      background: #fff;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--border);
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    th {
+      color: var(--muted);
+      background: #f9fafb;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    td input, td select, td textarea {
+      min-width: 120px;
+      padding: 8px 9px;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    td textarea {
+      min-width: 220px;
+      min-height: 46px;
+    }
+
+    .hotel-name {
+      min-width: 180px;
+      font-weight: 800;
+    }
+
+    .link-cell a, .map-link {
+      color: var(--accent);
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .link-cell a:hover, .map-link:hover { text-decoration: underline; }
+
+    .status {
+      font-weight: 800;
+    }
+
+    .status option { font-weight: normal; }
+
+    .row-actions {
+      display: flex;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+      margin-top: 10px;
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 36px 12px;
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 900px) {
+      .add-grid, .toolbar {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Hotel Offer Tracker</h1>
+    <p class="subtitle">Plak een hotellink, laat naam en locatie automatisch voorstellen, en volg daarna manueel status, prijs, pension en opvolging op. Alles wordt lokaal in je browser opgeslagen.</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="add-grid">
+        <div>
+          <label for="hotelUrl">Hotellink</label>
+          <input id="hotelUrl" type="url" placeholder="https://www.hotel-voorbeeld.at/" autocomplete="off" />
+          <div class="hint">Tip: gebruik bij voorkeur de officiële hotelwebsite. Booking/Tripadvisor-links werken soms ook, maar geven vaker vage namen.</div>
+        </div>
+        <button id="addBtn">Toevoegen</button>
+      </div>
+      <div id="lookupMessage" class="hint"></div>
+    </section>
+
+    <section class="card">
+      <div class="toolbar">
+        <div>
+          <label for="searchInput">Zoeken</label>
+          <input id="searchInput" type="search" placeholder="hotel, plaats, regio, opmerking..." />
+        </div>
+        <div>
+          <label for="statusFilter">Status</label>
+          <select id="statusFilter"></select>
+        </div>
+        <div>
+          <label for="sortBy">Sorteren</label>
+          <select id="sortBy">
+            <option value="createdDesc">Nieuwste eerst</option>
+            <option value="createdAsc">Oudste eerst</option>
+            <option value="nameAsc">Hotel A-Z</option>
+            <option value="locationAsc">Locatie A-Z</option>
+            <option value="followUpAsc">Follow-up eerst</option>
+            <option value="priceAsc">Prijs laag-hoog</option>
+          </select>
+        </div>
+        <button id="exportBtn" class="btn-secondary">Export JSON</button>
+        <button id="importBtn" class="btn-secondary">Import JSON</button>
+        <input id="importFile" type="file" accept="application/json" class="hidden" />
+      </div>
+      <div class="stats" id="stats"></div>
+    </section>
+
+    <section class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Hotel</th>
+              <th>Locatie</th>
+              <th>Status</th>
+              <th>Prijs</th>
+              <th>Pension</th>
+              <th>Personen</th>
+              <th>Follow-up</th>
+              <th>Opmerking</th>
+              <th>Link</th>
+              <th>Acties</th>
+            </tr>
+          </thead>
+          <tbody id="hotelTable"></tbody>
+        </table>
+      </div>
+      <div id="emptyState" class="empty hidden">Nog geen hotels toegevoegd. Plak hierboven je eerste hotellink.</div>
+    </section>
+  </main>
+
+  <script>
+    const STORAGE_KEY = 'hotel-offer-tracker-v1';
+
+    const STATUSES = [
+      'nog mailen',
+      'gemaild',
+      'antwoord ontvangen',
+      'beschikbaar',
+      'niet beschikbaar',
+      'te duur',
+      'favoriet',
+      'opvolgen',
+      'geboekt',
+      'afgevallen'
+    ];
+
+    let hotels = loadHotels();
+
+    const hotelUrl = document.getElementById('hotelUrl');
+    const addBtn = document.getElementById('addBtn');
+    const lookupMessage = document.getElementById('lookupMessage');
+    const hotelTable = document.getElementById('hotelTable');
+    const emptyState = document.getElementById('emptyState');
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const sortBy = document.getElementById('sortBy');
+    const exportBtn = document.getElementById('exportBtn');
+    const importBtn = document.getElementById('importBtn');
+    const importFile = document.getElementById('importFile');
+    const stats = document.getElementById('stats');
+
+    init();
+
+    function init() {
+      fillStatusFilter();
+      addBtn.addEventListener('click', addHotelFromUrl);
+      hotelUrl.addEventListener('keydown', event => {
+        if (event.key === 'Enter') addHotelFromUrl();
+      });
+      searchInput.addEventListener('input', render);
+      statusFilter.addEventListener('change', render);
+      sortBy.addEventListener('change', render);
+      exportBtn.addEventListener('click', exportJson);
+      importBtn.addEventListener('click', () => importFile.click());
+      importFile.addEventListener('change', importJson);
+      render();
+    }
+
+    function fillStatusFilter() {
+      statusFilter.innerHTML = '<option value="all">Alle statussen</option>' +
+        STATUSES.map(status => `<option value="${escapeHtml(status)}">${escapeHtml(status)}</option>`).join('');
+    }
+
+    async function addHotelFromUrl() {
+      const url = hotelUrl.value.trim();
+      if (!url) return;
+
+      const normalizedUrl = normalizeUrl(url);
+      if (!isValidUrl(normalizedUrl)) {
+        showMessage('Dit lijkt geen geldige URL. Gebruik bijvoorbeeld https://www.hotelnaam.at/', true);
+        return;
+      }
+
+      if (hotels.some(hotel => hotel.url === normalizedUrl)) {
+        showMessage('Deze link staat al in je tracker.', true);
+        return;
+      }
+
+      addBtn.disabled = true;
+      addBtn.textContent = 'Zoeken...';
+      showMessage('Ik probeer hotelnaam en locatie te vinden...');
+
+      try {
+        const guessedName = guessHotelNameFromUrl(normalizedUrl);
+        const place = await lookupPlace(guessedName, normalizedUrl);
+
+        const hotel = {
+          id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+          url: normalizedUrl,
+          name: place.name || guessedName || 'Onbekend hotel',
+          location: place.location || '',
+          country: place.country || '',
+          mapUrl: place.mapUrl || googleMapsSearchUrl(guessedName),
+          lat: place.lat || '',
+          lon: place.lon || '',
+          status: 'nog mailen',
+          price: '',
+          board: '',
+          guests: '',
+          followUp: '',
+          notes: '',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+
+        hotels.unshift(hotel);
+        saveHotels();
+        hotelUrl.value = '';
+        showMessage(`Toegevoegd: ${hotel.name}${hotel.location ? ' — ' + hotel.location : ''}`);
+        render();
+      } catch (error) {
+        console.error(error);
+        showMessage('Automatisch zoeken is mislukt. Ik voeg de link toe met een geschatte naam; je kan locatie manueel invullen.', true);
+        const guessedName = guessHotelNameFromUrl(normalizedUrl);
+        hotels.unshift({
+          id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+          url: normalizedUrl,
+          name: guessedName || 'Onbekend hotel',
+          location: '',
+          country: '',
+          mapUrl: googleMapsSearchUrl(guessedName),
+          lat: '',
+          lon: '',
+          status: 'nog mailen',
+          price: '',
+          board: '',
+          guests: '',
+          followUp: '',
+          notes: '',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        });
+        saveHotels();
+        render();
+      } finally {
+        addBtn.disabled = false;
+        addBtn.textContent = 'Toevoegen';
+      }
+    }
+
+    function normalizeUrl(input) {
+      if (!/^https?:\/\//i.test(input)) return `https://${input}`;
+      return input;
+    }
+
+    function isValidUrl(input) {
+      try {
+        const url = new URL(input);
+        return ['http:', 'https:'].includes(url.protocol) && url.hostname.includes('.');
+      } catch {
+        return false;
+      }
+    }
+
+    function guessHotelNameFromUrl(input) {
+      const url = new URL(input);
+      let host = url.hostname.toLowerCase().replace(/^www\./, '');
+      const parts = host.split('.');
+      let base = parts.length > 2 ? parts[parts.length - 3] : parts[0];
+
+      base = base
+        .replace(/[-_]+/g, ' ')
+        .replace(/\b(hotel|gasthof|pension|appartements|apartments|ferienhotel|resort)\b/g, ' $1 ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      const words = base.split(' ').filter(Boolean);
+      return titleCase(words.join(' '));
+    }
+
+    async function lookupPlace(name, inputUrl) {
+      const url = new URL(inputUrl);
+      const domainHint = url.hostname.replace(/^www\./, '');
+      const queries = [
+        `${name} hotel Austria`,
+        `${name} ${domainHint}`,
+        `${domainHint} hotel Austria`,
+        `${name} Tirol Salzburg Vorarlberg Austria`
+      ];
+
+      for (const query of queries) {
+        const result = await nominatimSearch(query);
+        if (result) return result;
+        await sleep(1000);
+      }
+
+      return {
+        name,
+        location: '',
+        country: '',
+        mapUrl: googleMapsSearchUrl(`${name} ${domainHint}`),
+        lat: '',
+        lon: ''
+      };
+    }
+
+    async function nominatimSearch(query) {
+      const endpoint = new URL('https://nominatim.openstreetmap.org/search');
+      endpoint.searchParams.set('q', query);
+      endpoint.searchParams.set('format', 'jsonv2');
+      endpoint.searchParams.set('addressdetails', '1');
+      endpoint.searchParams.set('limit', '5');
+
+      const response = await fetch(endpoint.toString(), {
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (!response.ok) return null;
+      const data = await response.json();
+      if (!Array.isArray(data) || data.length === 0) return null;
+
+      const best = data.find(item => {
+        const type = `${item.class || ''} ${item.type || ''} ${item.display_name || ''}`.toLowerCase();
+        return type.includes('hotel') || type.includes('tourism') || type.includes('guest_house') || type.includes('austria') || type.includes('österreich');
+      }) || data[0];
+
+      const address = best.address || {};
+      const town = address.city || address.town || address.village || address.municipality || address.hamlet || '';
+      const region = address.state || address.county || '';
+      const country = address.country || '';
+      const location = [town, region, country].filter(Boolean).join(', ');
+
+      return {
+        name: cleanOsmName(best.name) || cleanDisplayName(best.display_name),
+        location,
+        country,
+        mapUrl: best.lat && best.lon
+          ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(best.lat + ',' + best.lon)}`
+          : googleMapsSearchUrl(query),
+        lat: best.lat || '',
+        lon: best.lon || ''
+      };
+    }
+
+    function cleanOsmName(name) {
+      if (!name) return '';
+      return titleCase(String(name).trim());
+    }
+
+    function cleanDisplayName(displayName) {
+      if (!displayName) return '';
+      return titleCase(String(displayName).split(',')[0].trim());
+    }
+
+    function googleMapsSearchUrl(query) {
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query || 'hotel Austria')}`;
+    }
+
+    function render() {
+      const query = searchInput.value.trim().toLowerCase();
+      const status = statusFilter.value;
+
+      let rows = hotels.filter(hotel => {
+        const haystack = [
+          hotel.name,
+          hotel.location,
+          hotel.country,
+          hotel.status,
+          hotel.price,
+          hotel.board,
+          hotel.guests,
+          hotel.notes,
+          hotel.url
+        ].join(' ').toLowerCase();
+
+        const matchesQuery = !query || haystack.includes(query);
+        const matchesStatus = status === 'all' || hotel.status === status;
+        return matchesQuery && matchesStatus;
+      });
+
+      rows = sortRows(rows);
+
+      hotelTable.innerHTML = rows.map(renderRow).join('');
+      emptyState.classList.toggle('hidden', hotels.length > 0);
+      bindRowEvents();
+      renderStats();
+    }
+
+    function sortRows(rows) {
+      const mode = sortBy.value;
+      return [...rows].sort((a, b) => {
+        if (mode === 'createdAsc') return a.createdAt.localeCompare(b.createdAt);
+        if (mode === 'createdDesc') return b.createdAt.localeCompare(a.createdAt);
+        if (mode === 'nameAsc') return a.name.localeCompare(b.name, 'nl');
+        if (mode === 'locationAsc') return a.location.localeCompare(b.location, 'nl');
+        if (mode === 'followUpAsc') return (a.followUp || '9999-12-31').localeCompare(b.followUp || '9999-12-31');
+        if (mode === 'priceAsc') return parseNumber(a.price) - parseNumber(b.price);
+        return 0;
+      });
+    }
+
+    function renderRow(hotel) {
+      return `
+        <tr data-id="${hotel.id}">
+          <td><input class="hotel-name field" data-field="name" value="${escapeAttr(hotel.name)}" /></td>
+          <td>
+            <input class="field" data-field="location" value="${escapeAttr(hotel.location)}" placeholder="Sölden, Tirol, Oostenrijk" />
+            ${hotel.mapUrl ? `<div class="small"><a class="map-link" href="${escapeAttr(hotel.mapUrl)}" target="_blank" rel="noopener">kaart</a></div>` : ''}
+          </td>
+          <td>
+            <select class="status field" data-field="status">
+              ${STATUSES.map(status => `<option value="${escapeAttr(status)}" ${hotel.status === status ? 'selected' : ''}>${escapeHtml(status)}</option>`).join('')}
+            </select>
+          </td>
+          <td><input class="field" data-field="price" value="${escapeAttr(hotel.price)}" placeholder="bv. € 4.800" /></td>
+          <td><input class="field" data-field="board" value="${escapeAttr(hotel.board)}" placeholder="HP / ontbijt" /></td>
+          <td><input class="field" data-field="guests" value="${escapeAttr(hotel.guests)}" placeholder="14" /></td>
+          <td><input class="field" data-field="followUp" type="date" value="${escapeAttr(hotel.followUp)}" /></td>
+          <td><textarea class="field" data-field="notes" placeholder="kamerindeling, optie tot..., deadline...">${escapeHtml(hotel.notes)}</textarea></td>
+          <td class="link-cell"><a href="${escapeAttr(hotel.url)}" target="_blank" rel="noopener">open</a></td>
+          <td>
+            <div class="row-actions">
+              <button class="btn-secondary rel lookup-btn" type="button">Locatie</button>
+              <button class="btn-danger delete-btn" type="button">Wis</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    function bindRowEvents() {
+      document.querySelectorAll('.field').forEach(field => {
+        field.addEventListener('change', event => {
+          const row = event.target.closest('tr');
+          const id = row.dataset.id;
+          const key = event.target.dataset.field;
+          updateHotel(id, key, event.target.value);
+        });
+      });
+
+      document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', event => {
+          const id = event.target.closest('tr').dataset.id;
+          const hotel = hotels.find(item => item.id === id);
+          if (confirm(`Verwijder ${hotel?.name || 'dit hotel'}?`)) {
+            hotels = hotels.filter(item => item.id !== id);
+            saveHotels();
+            render();
+          }
+        });
+      });
+
+      document.querySelectorAll('.lookup-btn').forEach(button => {
+        button.addEventListener('click', async event => {
+          const row = event.target.closest('tr');
+          const id = row.dataset.id;
+          const hotel = hotels.find(item => item.id === id);
+          if (!hotel) return;
+
+          event.target.disabled = true;
+          event.target.textContent = 'Zoekt...';
+          try {
+            const place = await lookupPlace(hotel.name, hotel.url);
+            hotel.name = place.name || hotel.name;
+            hotel.location = place.location || hotel.location;
+            hotel.country = place.country || hotel.country;
+            hotel.mapUrl = place.mapUrl || hotel.mapUrl;
+            hotel.lat = place.lat || hotel.lat;
+            hotel.lon = place.lon || hotel.lon;
+            hotel.updatedAt = new Date().toISOString();
+            saveHotels();
+            render();
+          } catch (error) {
+            console.error(error);
+            alert('Locatie zoeken is mislukt. Probeer later opnieuw of vul manueel aan.');
+          } finally {
+            event.target.disabled = false;
+            event.target.textContent = 'Locatie';
+          }
+        });
+      });
+    }
+
+    function updateHotel(id, key, value) {
+      const hotel = hotels.find(item => item.id === id);
+      if (!hotel) return;
+      hotel[key] = value;
+      hotel.updatedAt = new Date().toISOString();
+
+      if (key === 'location' || key === 'name') {
+        hotel.mapUrl = googleMapsSearchUrl(`${hotel.name} ${hotel.location}`);
+      }
+
+      saveHotels();
+      renderStats();
+    }
+
+    function renderStats() {
+      const total = hotels.length;
+      const counts = STATUSES.reduce((acc, status) => {
+        acc[status] = hotels.filter(hotel => hotel.status === status).length;
+        return acc;
+      }, {});
+
+      stats.innerHTML = [
+        `<span class="pill">Totaal: ${total}</span>`,
+        ...STATUSES.filter(status => counts[status] > 0).map(status => `<span class="pill">${escapeHtml(status)}: ${counts[status]}</span>`)
+      ].join('');
+    }
+
+    function exportJson() {
+      const blob = new Blob([JSON.stringify(hotels, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const date = new Date().toISOString().slice(0, 10);
+      a.href = url;
+      a.download = `hotel-offer-tracker-${date}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    async function importJson(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      try {
+        const text = await file.text();
+        const imported = JSON.parse(text);
+        if (!Array.isArray(imported)) throw new Error('Geen geldige hotel-lijst.');
+
+        const replace = confirm('Wil je je huidige lijst vervangen? Kies Annuleren om te combineren.');
+        hotels = replace ? imported : mergeHotels(hotels, imported);
+        saveHotels();
+        render();
+      } catch (error) {
+        alert('Import mislukt: ' + error.message);
+      } finally {
+        importFile.value = '';
+      }
+    }
+
+    function mergeHotels(current, imported) {
+      const byUrl = new Map(current.map(hotel => [hotel.url, hotel]));
+      for (const hotel of imported) {
+        if (!hotel.url || byUrl.has(hotel.url)) continue;
+        byUrl.set(hotel.url, {
+          ...hotel,
+          id: hotel.id || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()))
+        });
+      }
+      return Array.from(byUrl.values());
+    }
+
+    function loadHotels() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveHotels() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(hotels));
+    }
+
+    function showMessage(message, isError = false) {
+      lookupMessage.textContent = message;
+      lookupMessage.style.color = isError ? 'var(--danger)' : 'var(--muted)';
+    }
+
+    function parseNumber(value) {
+      if (!value) return Number.MAX_SAFE_INTEGER;
+      const cleaned = String(value).replace(/[^0-9,.-]/g, '').replace(',', '.');
+      const number = Number.parseFloat(cleaned);
+      return Number.isFinite(number) ? number : Number.MAX_SAFE_INTEGER;
+    }
+
+    function titleCase(value) {
+      return String(value)
+        .split(' ')
+        .filter(Boolean)
+        .map(word => {
+          const lower = word.toLowerCase();
+          if (['am', 'an', 'der', 'die', 'das', 'of', 'and'].includes(lower)) return lower;
+          return lower.charAt(0).toUpperCase() + lower.slice(1);
+        })
+        .join(' ')
+        .replace(/\bAt\b/g, '')
+        .trim();
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value);
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+  </script>
+</body>
+</html>
